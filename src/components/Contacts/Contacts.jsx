@@ -33,7 +33,6 @@ export const Contacts = () => {
   let visibleContacts = [];
   if (data) {
     const contacts = data;
-    console.log('contacts', contacts);
     visibleContacts = contacts.filter(contact =>
       contact.name.toLowerCase().includes(filterName)
     );
