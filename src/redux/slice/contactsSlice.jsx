@@ -1,77 +1,61 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { fetchContacts, addContact, deleteContact } from '../operations';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+// createAPI – ядро RTK-Querry, определяет endpoints, через которые можно работать с API
+// fetchBaseQuerry – надтсройка над методом fetch, без 404 и json.stringify(parse), работает как axios;
 
-const setPending = state => {
-  state.isLoading = true;
-};
-const setError = (state, action) => {
-  state.isLoading = false;
-  state.error = action.payload;
-};
+const baseEndpointURL = 'https://638bb7497220b45d22958e91.mockapi.io/api/main';
 
-export const contactsSlice = createSlice({
-  name: 'contacts',
-  initialState: { items: [], isLoading: false, error: null },
-  reducers: {
-    appendContact: {
-      reducer(state, action) {
-        state.items.push(action.payload);
-      },
-      prepare(text) {
-        return {
-          payload: {
-            ...text,
-          },
-        };
-      },
-    },
-    removeContact(state, action) {
-      const index = state.items.findIndex(item => item.id === action.payload);
-      state.items.splice(index, 1);
-      // state.items = state.items.filter(item => item.id !== action.payload);
-    },
-  },
-  extraReducers: {
-    [fetchContacts.pending]: setPending,
+export const contactsApi = createApi({
+  reducerPath: 'contactsApi',
+  // reducerPath: 'contactsApi'- имя редюсера, в котором будут храниться данные
+  baseQuery: fetchBaseQuery({
+    // baseQuery - код подготовки fetch под тот API-бекенд, с которым мы будем работать;
+    baseUrl: baseEndpointURL,
+    // определение базового Url или нескольких Url,
+    // с которым будет работать baseQuery
+  }),
+  // tagTypes - ключ в кеше
+  tagTypes: ['Contacts'],
+  endpoints: builder => ({
+    // endpoints — функция, которая возвращает объект, в котом будут действия, делающиеся с бекендом (get, post, update, delete)
+    fetchContactsList: builder.query({
+      // builder вызывает метод query
+      query: () => '/contacts',
+      // прикрепление ключа Contacts к данным с бекенда для работы в кеше
+      providesTags: ['Contacts'],
+    }),
 
-    [fetchContacts.fulfilled]: (state, action) => {
-      state.isLoading = false;
-      state.error = null;
-      state.items = action.payload;
-    },
+    deleteContact: builder.mutation({
+      query: contactId => ({
+        url: `/contacts/${contactId}`,
+        method: 'DELETE',
+      }),
+      // Инвалидация (удаление) контакта в кеше, снятие ключа с него
+      invalidatesTags: ['Contacts'],
+    }),
 
-    [fetchContacts.rejected]: setError,
-    [addContact.rejected]: setError,
-    [deleteContact.rejected]: setError,
-  },
+    createContact: builder.mutation({
+      query: contactContent => ({
+        url: '/contacts',
+        method: 'POST',
+        body: contactContent,
+        // или
+        // body: {
+        //   name: contactContent.name,
+        //   phone: contactContent.phone
+        // },
+      }),
+      // перефетчить (зарендерить) новый созданный контакт в кеше
+      invalidatesTags: ['Contacts'],
+    }),
+  }),
 });
 
-export const { appendContact, removeContact } = contactsSlice.actions;
-export const contactsReducer = contactsSlice.reducer;
-
-// 2. BUILDER
-// extraReducers: (builder) => {
-//  builder.addCase(fetchContacts.pending, (state) => {
-//  state.isLoading = true;
-// },
-//  builder.addCase(fetchContacts.fulfilled, (state, action) => {
-//   state.isLoading = false;
-//   state.error = null;
-//   state.items = action.payload;
-// },
-//  builder.addCase(fetchContacts.rejected, (state, action) => {
-//  state.isLoading = false;
-//  state.error = action.payload;
-// },
-
-// 3. CLASSIC
-// extraReducers: {
-// [fetchContacts.pending]: state => {
-//   return { ...state, isLoading: true };
-// },
-// [fetchContacts.fulfilled]: (state, action) => {
-//   return { ...state, isLoading: false, error: null, items: action.payload };
-// },
-// [fetchContacts.rejected]: (state, action) => {
-//   return { ...state, isLoading: false, error: action.payload };
-// },
+// для кажого метода http-запроса, RTK-Query генерит свой собственный
+// хук добавляя спереди слово use и делая заглавной букву F → f → fetch
+// ПРИ ВЫЗОВЕ ХУКА  useCreateContactMutation — ДЕЛАЕТСЯ
+// СООТВЕТСТВУЮЩИЙ ЕМУ HTTP-ЗАПРОС (get, post, put, delete)
+export const {
+  useFetchContactsListQuery,
+  useDeleteContactMutation,
+  useCreateContactMutation,
+} = contactsApi;

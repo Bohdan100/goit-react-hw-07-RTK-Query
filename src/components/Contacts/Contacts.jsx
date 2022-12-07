@@ -1,30 +1,48 @@
 import React from 'react';
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchContacts } from 'redux/operations';
+import { useSelector } from 'react-redux';
+import { selectFilter } from 'redux/selectors';
+
+// RTK Query - hook useFetchContactsListQuery
+import { useFetchContactsListQuery } from 'redux/slice';
 
 import { ContactsList } from './Contacts.styled';
 import { ContactsItem } from './ContactsItem';
-import { selectContacts, selectFilter } from 'redux/selectors';
 import { Loader } from './Loader';
 
 export const Contacts = () => {
-  const dispatch = useDispatch();
-  const { items, isLoading, error } = useSelector(selectContacts);
   const filterName = useSelector(selectFilter);
 
-  useEffect(() => {
-    dispatch(fetchContacts());
-  }, [dispatch]);
+  // transform response в RTK Query - нужные данные с бекенда
+  const { data, isFetching, error } = useFetchContactsListQuery({
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+  });
+  // const {
+  //   currentData,
+  //   data,
+  //   error,
+  //   isFetching,
+  //   isLoading,
+  //   isSuccess,
+  //   isUninitialized,
+  //   isError,
+  //   refetch,
+  //   status,
+  // } = useFetchContactsListQuery();
 
-  let visibleContacts = items.filter(contact =>
-    contact.name.toLowerCase().includes(filterName)
-  );
+  let visibleContacts = [];
+  if (data) {
+    const contacts = data;
+    console.log('contacts', contacts);
+    visibleContacts = contacts.filter(contact =>
+      contact.name.toLowerCase().includes(filterName)
+    );
+  }
 
   return (
     <>
-      {isLoading && <Loader />}
-      {error && <b>{error}</b>}
+      {isFetching && <Loader />}
+      {error && <b>An error has occurred: {error.error}</b>}
       <ContactsList>
         {visibleContacts.length > 0 &&
           visibleContacts.map(({ id, name, phone }) => (

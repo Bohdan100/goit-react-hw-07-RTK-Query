@@ -1,7 +1,10 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { nanoid } from '@reduxjs/toolkit';
 
-import { addContact } from 'redux/operations';
+import {
+  useCreateContactMutation,
+  useFetchContactsListQuery,
+} from 'redux/slice';
 import { ToastContainer } from 'react-toastify';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -16,8 +19,9 @@ import {
 } from './ContactForm.styled';
 
 export const ContactForm = () => {
-  const dispatch = useDispatch();
-  const { items } = useSelector(selectContacts);
+  const [createContact] = useCreateContactMutation();
+  const { data } = useFetchContactsListQuery();
+  const contacts = data;
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -26,14 +30,14 @@ export const ContactForm = () => {
     const userName = form.elements.name.value;
     const userNumber = form.elements.number.value;
 
-    const errorArray = items.filter(
+    const errorArray = contacts.filter(
       contact => contact.name.toLowerCase() === userName.toLowerCase()
     );
 
     if (errorArray.length === 0) {
       const newContact = { name: userName, phone: userNumber };
 
-      dispatch(addContact(newContact));
+      createContact(newContact);
       toast.success('You add a new contact in your Phonebook!');
     } else {
       toast.info('This contact is already in your Phonebook!');

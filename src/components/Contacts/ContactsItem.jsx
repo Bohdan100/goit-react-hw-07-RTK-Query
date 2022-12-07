@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { useDispatch } from 'react-redux';
-import { deleteContact } from 'redux/operations';
+// RTK Query - hook useDeleteContactMutation
+import { useDeleteContactMutation } from 'redux/slice';
 
 import {
   ContactsListItem,
@@ -11,10 +11,10 @@ import {
 } from './ContactsItem.styled';
 
 export const ContactsItem = ({ id, name, number }) => {
-  const dispatch = useDispatch();
-
+  // deleteContact — триггер,  isLoading — один из параметров объекта
+  const [deleteContact, { isLoading }] = useDeleteContactMutation();
   const handleClick = () => {
-    dispatch(deleteContact(id));
+    deleteContact(id);
   };
 
   return (
@@ -24,7 +24,8 @@ export const ContactsItem = ({ id, name, number }) => {
       </ContactsListText>
 
       <ContactsButtonDelete type="button" onClick={handleClick}>
-        Delete
+        {/* При удаленнии - на кнопке надпись Deleting... */}
+        {isLoading ? 'Deleting...' : 'Delete'}
       </ContactsButtonDelete>
     </ContactsListItem>
   );
