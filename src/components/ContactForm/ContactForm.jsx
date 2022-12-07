@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { Spinner } from 'components/Spinner/Spinner';
 import { nanoid } from '@reduxjs/toolkit';
 
 import {
@@ -9,8 +9,6 @@ import { ToastContainer } from 'react-toastify';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { selectContacts } from 'redux/selectors';
-
 import {
   PhonebookForm,
   PhonebookFormButton,
@@ -19,7 +17,7 @@ import {
 } from './ContactForm.styled';
 
 export const ContactForm = () => {
-  const [createContact] = useCreateContactMutation();
+  const [createContact, { isLoading }] = useCreateContactMutation();
   const { data } = useFetchContactsListQuery();
   const contacts = data;
 
@@ -65,7 +63,9 @@ export const ContactForm = () => {
           title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
           required
         />
-        <PhonebookFormButton type="submit">Add contact</PhonebookFormButton>
+        <PhonebookFormButton type="submit" disabled={isLoading}>
+          {isLoading ? <Spinner size={16} /> : 'Add contact'}
+        </PhonebookFormButton>
       </PhonebookForm>
       <ToastContainer autoClose={2000} position="top-center" theme="colored" />
     </>
