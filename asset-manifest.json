@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/goit-react-hw-07-RTK-Query/static/css/main.9f842b21.css",
+    "main.js": "/goit-react-hw-07-RTK-Query/static/js/main.cc27e259.js",
+    "index.html": "/goit-react-hw-07-RTK-Query/index.html",
+    "main.9f842b21.css.map": "/goit-react-hw-07-RTK-Query/static/css/main.9f842b21.css.map",
+    "main.cc27e259.js.map": "/goit-react-hw-07-RTK-Query/static/js/main.cc27e259.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.9f842b21.css",
+    "static/js/main.cc27e259.js"
+  ]
+}
