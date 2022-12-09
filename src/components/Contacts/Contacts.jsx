@@ -13,7 +13,11 @@ export const Contacts = () => {
   const filterName = useSelector(selectFilter);
 
   // transform response в RTK Query - нужные данные с бекенда
-  const { data, isFetching, error } = useFetchContactsListQuery({
+  const {
+    data: contacts,
+    isFetching,
+    error,
+  } = useFetchContactsListQuery({
     refetchOnFocus: true,
     refetchOnReconnect: true,
   });
@@ -31,8 +35,7 @@ export const Contacts = () => {
   // } = useFetchContactsListQuery();
 
   let visibleContacts = [];
-  if (data) {
-    const contacts = data;
+  if (contacts) {
     visibleContacts = contacts.filter(contact =>
       contact.name.toLowerCase().includes(filterName)
     );

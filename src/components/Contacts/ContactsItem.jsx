@@ -23,7 +23,11 @@ export const ContactsItem = ({ id, name, number }) => {
         {name}: {number}
       </ContactsListText>
 
-      <ContactsButtonDelete type="button" onClick={handleClick}>
+      <ContactsButtonDelete
+        type="button"
+        onClick={handleClick}
+        disabled={isLoading}
+      >
         {/* При удаленнии - на кнопке надпись Deleting... */}
         {isLoading ? 'Deleting...' : 'Delete'}
       </ContactsButtonDelete>

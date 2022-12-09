@@ -18,8 +18,7 @@ import {
 
 export const ContactForm = () => {
   const [createContact, { isLoading }] = useCreateContactMutation();
-  const { data } = useFetchContactsListQuery();
-  const contacts = data;
+  const { data: contacts } = useFetchContactsListQuery();
 
   const handleSubmit = async e => {
     e.preventDefault();
